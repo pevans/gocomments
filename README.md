@@ -3,8 +3,10 @@
 gocomments is a tool that reformats your Go comments to respect your preferred
 line and tab lengths. Its broad intention is to automate what might happen if
 you used your editor's autoformat command on each of your comments. It is an
-add-on tool for projects that are already using gofmt or gofumpt, which
-themselves do not alter the contents of comments.
+add-on tool for projects that are already using
+[gofmt](https://pkg.go.dev/cmd/gofmt) or
+[gofumpt](https://github.com/mvdan/gofumpt), which themselves do not alter the
+contents of comments.
 
 gocomments is designed to look and act similarly to gofmt; it accepts many of
 gofmt's command-line arguments, both their form and intent. Below you will
@@ -53,9 +55,10 @@ include:
 
 ## Why not use golines instead?
 
-An existing formatter that can format comments is golines. It has been
-archived their org-owner, Segmentio, although a fork has been created by the
-maintainers of golangci-lint.
+An existing formatter that can format comments is
+[golines](https://github.com/segmentio/golines). It has been archived by their
+org-owner, Segmentio, although [a fork has been created by the maintainers of
+golangci-lint](https://github.com/golangci/golines/).
 
 Golines is intended to shorten long lines in several contexts. It does not
 reformat comments by default. To replicate the behavior of gocomments, you
