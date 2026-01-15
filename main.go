@@ -32,16 +32,34 @@ func main() {
 	flag.Parse()
 
 	paths := flag.Args()
-	if len(paths) == 0 {
-		flag.Usage()
-		os.Exit(1)
-	}
 
 	opts := options{
 		write:     *write,
 		diff:      *diff,
 		list:      *list,
 		tabLength: *tabLength,
+	}
+
+	// If no paths provided, check if stdin has data
+	if len(paths) == 0 {
+		stat, err := os.Stdin.Stat()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error checking stdin: %v\n", err)
+			os.Exit(1)
+		}
+
+		// If stdin is a pipe or file (not a terminal), read from it
+		if (stat.Mode() & os.ModeCharDevice) == 0 {
+			if err := formatStdin(*lineLength, *tabLength); err != nil {
+				fmt.Fprintf(os.Stderr, "error processing stdin: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		}
+
+		// No paths and no stdin data, show usage
+		flag.Usage()
+		os.Exit(1)
 	}
 
 	hasChanges := false

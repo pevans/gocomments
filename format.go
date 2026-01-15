@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"go/ast"
+	"go/parser"
 	"go/token"
+	"io"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -170,6 +174,28 @@ func reformatCommentGroup(
 	}
 
 	return newLines
+}
+
+// formatStdin is a wrapper that takes data from stdin and gives it to the
+// reformatComments function to update. As an outcome, it prints its data back
+// to stdout.
+func formatStdin(lineLength, tabLength int) error {
+	content, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return err
+	}
+
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, "<stdin>", content, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+
+	result := reformatComments(string(content), file, fset, lineLength, tabLength)
+
+	fmt.Print(result)
+
+	return nil
 }
 
 // wrapText takes some given text and a length, and with that produces a set
