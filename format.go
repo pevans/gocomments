@@ -95,6 +95,12 @@ func reformatCommentGroup(
 
 	// If there's more slashes in this block, keep them
 	firstCommentText := comments[0].Text
+
+	// Don't reformat block comments that begin with /*
+	if strings.HasPrefix(firstCommentText, "/*") {
+		return lines
+	}
+
 	for i := 0; i < len(firstCommentText) && firstCommentText[i] == '/'; i++ {
 		slashCount = i + 1
 	}

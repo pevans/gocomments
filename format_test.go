@@ -293,6 +293,44 @@ func example() {}
 func example() {}
 `,
 		},
+		{
+			name:       "block comment not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+/* This is a very long block comment that would normally be wrapped if it was a line comment but should not be reformatted */
+func example() {}
+`,
+			want: `package main
+
+/* This is a very long block comment that would normally be wrapped if it was a line comment but should not be reformatted */
+func example() {}
+`,
+		},
+		{
+			name:       "multi-line block comment not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+/*
+This is a multi-line block comment
+   with unusual formatting
+      and indentation that should be preserved
+*/
+func example() {}
+`,
+			want: `package main
+
+/*
+This is a multi-line block comment
+   with unusual formatting
+      and indentation that should be preserved
+*/
+func example() {}
+`,
+		},
 	}
 
 	for _, tt := range tests {
