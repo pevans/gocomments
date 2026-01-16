@@ -331,6 +331,90 @@ This is a multi-line block comment
 func example() {}
 `,
 		},
+		{
+			name:       "commented out code statements not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+func example() {
+	// x := 42
+	// y := 100
+	// return x + y
+}
+`,
+			want: `package main
+
+func example() {
+	// x := 42
+	// y := 100
+	// return x + y
+}
+`,
+		},
+		{
+			name:       "commented out function not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// func oldFunction() {
+//     println("This is a very long line that would normally be wrapped but it's commented out code")
+//     return
+// }
+
+func example() {}
+`,
+			want: `package main
+
+// func oldFunction() {
+//     println("This is a very long line that would normally be wrapped but it's commented out code")
+//     return
+// }
+
+func example() {}
+`,
+		},
+		{
+			name:       "commented out declarations not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// type OldStruct struct {
+//     Field1 string
+//     Field2 int
+// }
+
+func example() {}
+`,
+			want: `package main
+
+// type OldStruct struct {
+//     Field1 string
+//     Field2 int
+// }
+
+func example() {}
+`,
+		},
+		{
+			name:       "regular long comment still reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// This is just a regular comment that happens to mention code like func and return but is not actual code
+func example() {}
+`,
+			want: `package main
+
+// This is just a regular comment that happens to
+// mention code like func and return but is not
+// actual code
+func example() {}
+`,
+		},
 	}
 
 	for _, tt := range tests {

@@ -70,6 +70,44 @@ func reformatComments(
 	return strings.Join(lines, "\n")
 }
 
+// isCommentedCode returns true if a comment block contains only valid Go code
+func isCommentedCode(comments []*ast.Comment, commentPrefix string) bool {
+	// Extract the text from all comments
+	var textLines []string
+	for _, comment := range comments {
+		text := comment.Text
+		// Remove the comment prefix
+		text = strings.TrimPrefix(text, commentPrefix)
+		text = strings.TrimPrefix(text, " ")
+		textLines = append(textLines, text)
+	}
+
+	fullText := strings.Join(textLines, "\n")
+
+	// Try to parse as a complete Go file
+	fset := token.NewFileSet()
+	_, err := parser.ParseFile(fset, "", fullText, parser.AllErrors)
+	if err == nil {
+		return true
+	}
+
+	// Try wrapping in a function and parsing
+	wrappedText := "package main\nfunc _() {\n" + fullText + "\n}"
+	_, err = parser.ParseFile(fset, "", wrappedText, parser.AllErrors)
+	if err == nil {
+		return true
+	}
+
+	// Try wrapping as top-level declarations
+	wrappedText = "package main\n" + fullText
+	_, err = parser.ParseFile(fset, "", wrappedText, parser.AllErrors)
+	if err == nil {
+		return true
+	}
+
+	return false
+}
+
 // reformatCommentGroup reformats one specific group of comments.
 func reformatCommentGroup(
 	lines []string,
@@ -106,6 +144,11 @@ func reformatCommentGroup(
 	}
 
 	commentPrefix := strings.Repeat("/", slashCount)
+
+	// Don't reformat if the comment block contains valid Go code
+	if isCommentedCode(comments, commentPrefix) {
+		return lines
+	}
 
 	// Calculate available space for text. If we're running really low on
 	// available space, we'll push out the width of the comment to 40
