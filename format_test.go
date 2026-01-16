@@ -222,6 +222,77 @@ func example() {}
 func example() {}
 `,
 		},
+		{
+			name:       "noformat directive preserves formatting",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// This is a very long comment that would normally be wrapped but has gocomments:noformat
+func example() {}
+`,
+			want: `package main
+
+// This is a very long comment that would normally be wrapped but has gocomments:noformat
+func example() {}
+`,
+		},
+		{
+			name:       "noformat directive preserves multi-line formatting",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// This is a long comment gocomments:noformat
+// that spans multiple lines
+// and should not be reformatted
+func example() {}
+`,
+			want: `package main
+
+// This is a long comment gocomments:noformat
+// that spans multiple lines
+// and should not be reformatted
+func example() {}
+`,
+		},
+		{
+			name:       "noformat directive only affects its paragraph",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// This long comment should be wrapped because it has no directive and is too long
+//
+// But this one should not be reformatted gocomments:noformat
+func example() {}
+`,
+			want: `package main
+
+// This long comment should be wrapped because it
+// has no directive and is too long
+//
+// But this one should not be reformatted gocomments:noformat
+func example() {}
+`,
+		},
+		{
+			name:       "noformat with unusual spacing preserved",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// Unusual    spacing     here  gocomments:noformat
+//    and   here   too
+func example() {}
+`,
+			want: `package main
+
+// Unusual    spacing     here  gocomments:noformat
+//    and   here   too
+func example() {}
+`,
+		},
 	}
 
 	for _, tt := range tests {

@@ -112,12 +112,14 @@ func reformatCommentGroup(
 	type paragraph struct {
 		texts           []string
 		hasLeadingSpace bool
+		originalLines   []string // preserve original lines for noformat directive
 	}
 	var paragraphs []paragraph
 	currentParagraph := paragraph{hasLeadingSpace: true}
 
 	for _, comment := range comments {
 		text := comment.Text
+		originalLine := comment.Text // save original before modifications
 
 		// Remove the leading slashes and any space after them
 		text = strings.TrimPrefix(text, commentPrefix)
@@ -139,12 +141,14 @@ func reformatCommentGroup(
 			paragraphs = append(paragraphs, paragraph{
 				texts:           []string{text},
 				hasLeadingSpace: hasLeadingSpace,
+				originalLines:   []string{originalLine},
 			})
 		} else {
 			if len(currentParagraph.texts) == 0 {
 				currentParagraph.hasLeadingSpace = hasLeadingSpace
 			}
 			currentParagraph.texts = append(currentParagraph.texts, text)
+			currentParagraph.originalLines = append(currentParagraph.originalLines, originalLine)
 		}
 	}
 
@@ -159,6 +163,15 @@ func reformatCommentGroup(
 		// Empty paragraph means blank line
 		if len(para.texts) == 1 && para.texts[0] == "" {
 			newCommentLines = append(newCommentLines, indent+commentPrefix)
+			continue
+		}
+
+		// Check if first line has the noformat directive
+		if len(para.texts) > 0 && strings.HasSuffix(strings.TrimSpace(para.texts[0]), "gocomments:noformat") {
+			// Preserve original formatting
+			for _, originalLine := range para.originalLines {
+				newCommentLines = append(newCommentLines, indent+originalLine)
+			}
 			continue
 		}
 
