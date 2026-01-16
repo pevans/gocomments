@@ -121,7 +121,7 @@ func reformatCommentGroup(
 
 		// Remove the leading slashes and any space after them
 		text = strings.TrimPrefix(text, commentPrefix)
-		hasLeadingSpace := len(text) > 0 && text[0] == ' '
+		hasLeadingSpace := len(text) > 0 && (text[0] == ' ' || text[0] == '\t')
 		text = strings.TrimPrefix(text, " ")
 
 		if paragraphDelimiter(text) {
