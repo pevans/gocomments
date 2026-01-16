@@ -7,10 +7,11 @@ import (
 )
 
 type options struct {
-	write     bool
-	diff      bool
-	list      bool
-	tabLength int
+	write      bool
+	diff       bool
+	list       bool
+	tabLength  int
+	lineLength int
 }
 
 func main() {
@@ -34,10 +35,11 @@ func main() {
 	paths := flag.Args()
 
 	opts := options{
-		write:     *write,
-		diff:      *diff,
-		list:      *list,
-		tabLength: *tabLength,
+		write:      *write,
+		diff:       *diff,
+		list:       *list,
+		tabLength:  *tabLength,
+		lineLength: *lineLength,
 	}
 
 	// If no paths provided, check if stdin has data
@@ -50,7 +52,7 @@ func main() {
 
 		// If stdin is a pipe or file (not a terminal), read from it
 		if (stat.Mode() & os.ModeCharDevice) == 0 {
-			if err := formatStdin(*lineLength, *tabLength); err != nil {
+			if err := formatStdin(opts); err != nil {
 				fmt.Fprintf(os.Stderr, "error processing stdin: %v\n", err)
 				os.Exit(1)
 			}
@@ -64,7 +66,7 @@ func main() {
 
 	hasChanges := false
 	for _, path := range paths {
-		changed, err := walkPath(path, *lineLength, opts)
+		changed, err := walkPath(path, opts)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error walking %s: %v\n", path, err)
 			os.Exit(1)

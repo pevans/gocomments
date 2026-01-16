@@ -13,12 +13,12 @@ import (
 
 // walkPath will walk through some unknown path and reformat any comments it
 // finds, using the provided line length as its ruler.
-func walkPath(path string, lineLength int, opts options) (bool, error) {
+func walkPath(path string, opts options) (bool, error) {
 	// Recurse through all subdirectories of the provided path, but exclude
 	// hidden directories found therein.
 	if strings.HasSuffix(path, "/...") {
 		baseDir := strings.TrimSuffix(path, "/...")
-		return walkDirectory(baseDir, lineLength, opts, true)
+		return walkDirectory(baseDir, opts, true)
 	}
 
 	info, err := os.Stat(path)
@@ -27,13 +27,13 @@ func walkPath(path string, lineLength int, opts options) (bool, error) {
 	}
 
 	if info.IsDir() {
-		return walkDirectory(path, lineLength, opts, false)
+		return walkDirectory(path, opts, false)
 	}
 
-	return visitFile(path, lineLength, opts)
+	return visitFile(path, opts)
 }
 
-func walkDirectory(dir string, lineLength int, opts options, skipHidden bool) (bool, error) {
+func walkDirectory(dir string, opts options, skipHidden bool) (bool, error) {
 	hasChanges := false
 
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -57,7 +57,7 @@ func walkDirectory(dir string, lineLength int, opts options, skipHidden bool) (b
 		}
 
 		// If we get here, then we actually want to visit the file we found
-		changed, err := visitFile(path, lineLength, opts)
+		changed, err := visitFile(path, opts)
 		if err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func walkDirectory(dir string, lineLength int, opts options, skipHidden bool) (b
 // - print a diff of what would change
 // - list the file as something that might change
 // - if nothing else, print the reformatted file to stdout
-func visitFile(filename string, lineLength int, opts options) (bool, error) {
+func visitFile(filename string, opts options) (bool, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return false, err
@@ -90,7 +90,7 @@ func visitFile(filename string, lineLength int, opts options) (bool, error) {
 		return false, err
 	}
 
-	result := reformatComments(string(content), file, fset, lineLength, opts.tabLength)
+	result := reformatComments(string(content), file, fset, opts)
 
 	// Are there any changes?
 	original := string(content)

@@ -20,8 +20,7 @@ func reformatComments(
 	content string,
 	file *ast.File,
 	fset *token.FileSet,
-	lineLength int,
-	tabLength int,
+	opts options,
 ) string {
 	lines := strings.Split(content, "\n")
 
@@ -64,7 +63,7 @@ func reformatComments(
 
 	// Process comments in reverse order to avoid index issues
 	for i := len(toReformat) - 1; i >= 0; i-- {
-		lines = reformatCommentGroup(lines, toReformat[i].comments, fset, lineLength, tabLength)
+		lines = reformatCommentGroup(lines, toReformat[i].comments, fset, opts)
 	}
 
 	return strings.Join(lines, "\n")
@@ -113,8 +112,7 @@ func reformatCommentGroup(
 	lines []string,
 	comments []*ast.Comment,
 	fset *token.FileSet,
-	lineLength int,
-	tabLength int,
+	opts options,
 ) []string {
 	if len(comments) == 0 {
 		return lines
@@ -126,7 +124,7 @@ func reformatCommentGroup(
 	firstLine := lines[firstLineIdx]
 
 	indent := firstLine[:firstPos.Column-1]
-	indentWithSpaces := strings.ReplaceAll(indent, "\t", strings.Repeat(" ", tabLength))
+	indentWithSpaces := strings.ReplaceAll(indent, "\t", strings.Repeat(" ", opts.tabLength))
 
 	// Determine the number of slashes
 	slashCount := 2 // default to commenting with "//" as the leader
@@ -152,9 +150,9 @@ func reformatCommentGroup(
 
 	// Calculate available space for text. If we're running really low on
 	// available space, we'll push out the width of the comment to 40
-	availableLength := lineLength - len(indentWithSpaces) - len(commentPrefix) - 1
+	availableLength := opts.lineLength - len(indentWithSpaces) - len(commentPrefix) - 1
 	if availableLength <= 0 {
-		availableLength = max(lineLength-len(commentPrefix)-1, 40)
+		availableLength = max(opts.lineLength-len(commentPrefix)-1, 40)
 	}
 
 	// Group comments into paragraphs (separated by empty comment lines)
@@ -256,7 +254,7 @@ func reformatCommentGroup(
 // formatStdin is a wrapper that takes data from stdin and gives it to the
 // reformatComments function to update. As an outcome, it prints its data back
 // to stdout.
-func formatStdin(lineLength, tabLength int) error {
+func formatStdin(opts options) error {
 	content, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return err
@@ -268,7 +266,7 @@ func formatStdin(lineLength, tabLength int) error {
 		return err
 	}
 
-	result := reformatComments(string(content), file, fset, lineLength, tabLength)
+	result := reformatComments(string(content), file, fset, opts)
 
 	fmt.Print(result)
 

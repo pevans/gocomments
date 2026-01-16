@@ -73,7 +73,7 @@ func Hidden() {}
 			os.Stdout = f
 
 			// Process the path
-			_, err = walkPath(tt.path, 78, options{})
+			_, err = walkPath(tt.path, options{lineLength: 78})
 
 			// Restore stdout
 			f.Close()
@@ -160,7 +160,7 @@ func Git() {}
 			assert.NoError(t, err, "failed to create output file")
 			os.Stdout = f
 
-			_, err = walkDirectory(tmpDir, 78, options{}, tt.skipHidden)
+			_, err = walkDirectory(tmpDir, options{lineLength: 78}, tt.skipHidden)
 
 			f.Close()
 			os.Stdout = oldStdout
@@ -207,7 +207,7 @@ func Test() {}
 	os.WriteFile(testFile, []byte(original), 0o644)
 
 	// Process with write mode
-	changed, err := visitFile(testFile, 78, options{write: true})
+	changed, err := visitFile(testFile, options{lineLength: 78, write: true})
 	assert.NoError(t, err, "visitFile() failed")
 	assert.True(t, changed, "visitFile() should detect changes")
 
@@ -231,7 +231,7 @@ func Test() {}
 	os.WriteFile(testFile, []byte(alreadyFormatted), 0o644)
 
 	// Process file that doesn't need changes
-	changed, err := visitFile(testFile, 78, options{})
+	changed, err := visitFile(testFile, options{lineLength: 78})
 	assert.NoError(t, err, "visitFile() failed")
 	assert.False(t, changed, "visitFile() should not detect changes")
 
@@ -261,7 +261,7 @@ func Test() {}
 		os.Stdout = f
 
 		// Process with diff mode
-		changed, err := visitFile(testFile, 78, options{diff: true})
+		changed, err := visitFile(testFile, options{lineLength: 78, diff: true})
 
 		f.Close()
 		os.Stdout = oldStdout
@@ -291,7 +291,7 @@ func Test() {}
 		os.Stdout = f
 
 		// Process with diff mode
-		changed, err := visitFile(testFile, 78, options{diff: true})
+		changed, err := visitFile(testFile, options{lineLength: 78, diff: true})
 
 		f.Close()
 		os.Stdout = oldStdout
@@ -321,7 +321,7 @@ func Test() {}
 		os.Stdout = f
 
 		// Process with normal mode (diff=false)
-		changed, err := visitFile(testFile, 78, options{})
+		changed, err := visitFile(testFile, options{lineLength: 78})
 
 		f.Close()
 		os.Stdout = oldStdout

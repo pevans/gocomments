@@ -425,7 +425,10 @@ func example() {}
 			assert.NoError(t, err, "failed to parse input")
 
 			// Reformat
-			got := reformatComments(tt.input, file, fset, tt.lineLength, tt.tabLength)
+			got := reformatComments(tt.input, file, fset, options{
+				lineLength: tt.lineLength,
+				tabLength:  tt.tabLength,
+			})
 
 			assert.Equal(t, tt.want, got, "reformatComments() output mismatch")
 		})
