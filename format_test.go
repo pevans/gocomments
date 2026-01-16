@@ -143,6 +143,85 @@ func example() {
 }
 `,
 		},
+		{
+			name:       "comment without leading space preserved",
+			lineLength: 78,
+			tabLength:  4,
+			input: `package main
+
+//This is a comment without a leading space
+func example() {}
+`,
+			want: `package main
+
+//This is a comment without a leading space
+func example() {}
+`,
+		},
+		{
+			name:       "long comment without leading space wrapped correctly",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+//This is a very long comment without a leading space that needs to be wrapped
+func example() {}
+`,
+			want: `package main
+
+//This is a very long comment without a leading
+//space that needs to be wrapped
+func example() {}
+`,
+		},
+		{
+			name:       "triple slash without leading space preserved",
+			lineLength: 60,
+			tabLength:  4,
+			input: `package main
+
+///Documentation comment without leading space
+func example() {}
+`,
+			want: `package main
+
+///Documentation comment without leading space
+func example() {}
+`,
+		},
+		{
+			name:       "long triple slash without leading space wrapped correctly",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+///This is a long documentation comment without leading space that needs wrapping
+func example() {}
+`,
+			want: `package main
+
+///This is a long documentation comment without
+///leading space that needs wrapping
+func example() {}
+`,
+		},
+		{
+			name:       "mixed spacing in paragraph uses first line's spacing",
+			lineLength: 80,
+			tabLength:  4,
+			input: `package main
+
+//First line without space
+// Second line with space
+//Third line without space
+func example() {}
+`,
+			want: `package main
+
+//First line without space Second line with space Third line without space
+func example() {}
+`,
+		},
 	}
 
 	for _, tt := range tests {

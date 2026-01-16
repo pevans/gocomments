@@ -110,15 +110,18 @@ func reformatCommentGroup(
 
 	// Group comments into paragraphs (separated by empty comment lines)
 	type paragraph struct {
-		texts []string
+		texts           []string
+		hasLeadingSpace bool
 	}
 	var paragraphs []paragraph
-	currentParagraph := paragraph{}
+	currentParagraph := paragraph{hasLeadingSpace: true}
 
 	for _, comment := range comments {
 		text := comment.Text
+
 		// Remove the leading slashes and any space after them
 		text = strings.TrimPrefix(text, commentPrefix)
+		hasLeadingSpace := len(text) > 0 && text[0] == ' '
 		text = strings.TrimPrefix(text, " ")
 
 		if paragraphDelimiter(text) {
@@ -132,8 +135,15 @@ func reformatCommentGroup(
 			// was blank (e.g. it's just a blank line comment), then that's
 			// what gets added. But if it's a list item, then it'll contain
 			// that.
-			paragraphs = append(paragraphs, paragraph{texts: []string{text}})
+			currentParagraph.hasLeadingSpace = hasLeadingSpace
+			paragraphs = append(paragraphs, paragraph{
+				texts:           []string{text},
+				hasLeadingSpace: hasLeadingSpace,
+			})
 		} else {
+			if len(currentParagraph.texts) == 0 {
+				currentParagraph.hasLeadingSpace = hasLeadingSpace
+			}
 			currentParagraph.texts = append(currentParagraph.texts, text)
 		}
 	}
@@ -158,7 +168,12 @@ func reformatCommentGroup(
 
 		// Build the comment lines for this paragraph
 		for _, wrappedLine := range wrappedLines {
-			newCommentLines = append(newCommentLines, indent+commentPrefix+" "+wrappedLine)
+			sep := " "
+			if !para.hasLeadingSpace {
+				sep = ""
+			}
+
+			newCommentLines = append(newCommentLines, indent+commentPrefix+sep+wrappedLine)
 		}
 	}
 
