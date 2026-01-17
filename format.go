@@ -19,6 +19,17 @@ func reformatComments(
 	fset *token.FileSet,
 	opts options,
 ) string {
+	// If this looks like a generated source file (e.g. `go generate ...`),
+	// ignore it.
+	for _, commentGroup := range file.Comments {
+		for _, comment := range commentGroup.List {
+			text := comment.Text
+			if strings.Contains(text, "Code generated") && strings.Contains(text, "DO NOT EDIT") {
+				return content
+			}
+		}
+	}
+
 	lines := strings.Split(content, "\n")
 
 	type commentToReformat struct {

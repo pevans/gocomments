@@ -43,6 +43,8 @@ well-formatted. Below are some examples:
 gocomments tries to maintain certain formatting choices within comments. Those
 include:
 
+- Generated files. If any single comment in a file contains both "Code generated"
+  and "DO NOT EDIT" in the same line, gocomments will leave the file untouched.
 - Additional slashes in the comment leader. Like using `///` for certain
   comments? gocomments will make sure that those are used correctly throughout
   any comment block they are found.
