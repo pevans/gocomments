@@ -52,9 +52,10 @@ include:
 - Bullet list and numbered list items. gocomments will independently format
   each list item as if it were its own paragraph block, and will maintain list
   item indentation -- including for sublist items.
-- Comments without any spacing to begin with (for example, `//go:embed ...`)
-  may be formatted, but the lack of spacing between the comment leader and
-  the text will be preserved.
+- Go directive comments (like `//go:embed`, `//go:build`, `//go:generate`)
+  are left untouched. Other comments without spacing between the comment
+  leader and text may be formatted, but the lack of spacing will be
+  preserved.
 - Any lines of code that are commented out are left alone.
 - Slash-star inline comment blocks (`/* ... */`) are left alone.
 

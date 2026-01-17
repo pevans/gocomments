@@ -140,6 +140,15 @@ func reformatCommentGroup(
 
 	commentPrefix := strings.Repeat("/", slashCount)
 
+	// Don't reformat Go directive comments (e.g., //go:embed, //go:build)
+	// Only skip if there's NO space after the slashes and it starts with
+	// "go:"
+	firstCommentWithoutPrefix := strings.TrimPrefix(firstCommentText, commentPrefix)
+	hasLeadingSpace := len(firstCommentWithoutPrefix) > 0 && (firstCommentWithoutPrefix[0] == ' ' || firstCommentWithoutPrefix[0] == '\t')
+	if !hasLeadingSpace && strings.HasPrefix(firstCommentWithoutPrefix, "go:") {
+		return lines
+	}
+
 	// Don't reformat if the comment block contains valid Go code
 	if isCommentedCode(comments, commentPrefix) {
 		return lines

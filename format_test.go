@@ -415,6 +415,83 @@ func example() {}
 func example() {}
 `,
 		},
+		{
+			name:       "go:embed directive not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+//go:embed static/index.html static/styles.css
+var files embed.FS
+`,
+			want: `package main
+
+//go:embed static/index.html static/styles.css
+var files embed.FS
+`,
+		},
+		{
+			name:       "go:build directive not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+//go:build linux || darwin || windows
+func example() {}
+`,
+			want: `package main
+
+//go:build linux || darwin || windows
+func example() {}
+`,
+		},
+		{
+			name:       "go:generate directive not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+//go:generate mockgen -source=interface.go -destination=mocks/mock.go
+func example() {}
+`,
+			want: `package main
+
+//go:generate mockgen -source=interface.go -destination=mocks/mock.go
+func example() {}
+`,
+		},
+		{
+			name:       "go directive with space still formatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// go: this is just a regular comment that mentions go: and should be formatted normally
+func example() {}
+`,
+			want: `package main
+
+// go: this is just a regular comment that
+// mentions go: and should be formatted normally
+func example() {}
+`,
+		},
+		{
+			name:       "comment mentioning go:embed in text still formatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+// This comment explains how to use go:embed directives in your code
+func example() {}
+`,
+			want: `package main
+
+// This comment explains how to use go:embed
+// directives in your code
+func example() {}
+`,
+		},
 	}
 
 	for _, tt := range tests {
