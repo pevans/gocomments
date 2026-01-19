@@ -34,9 +34,15 @@ func walkPath(path string, opts options) (bool, error) {
 }
 
 func walkDirectory(dir string, opts options, skipHidden bool) (bool, error) {
+	// Resolve symlinks so filepath.Walk will traverse the actual directory
+	resolvedDir, err := filepath.EvalSymlinks(dir)
+	if err != nil {
+		return false, err
+	}
+
 	hasChanges := false
 
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(resolvedDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

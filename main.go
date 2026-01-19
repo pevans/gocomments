@@ -34,12 +34,22 @@ func main() {
 
 	paths := flag.Args()
 
+	// Use defaults for invalid values
+	tlen := *tabLength
+	if tlen <= 0 {
+		tlen = 4
+	}
+	llen := *lineLength
+	if llen <= 0 {
+		llen = 78
+	}
+
 	opts := options{
 		write:      *write,
 		diff:       *diff,
 		list:       *list,
-		tabLength:  *tabLength,
-		lineLength: *lineLength,
+		tabLength:  tlen,
+		lineLength: llen,
 	}
 
 	// If no paths provided, check if stdin has data
