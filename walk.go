@@ -73,11 +73,14 @@ func walkDirectory(dir string, opts options, skipHidden bool) (bool, error) {
 }
 
 // visitFile reads Go comments in an file and will perform one of several
-// functions indicated in the provided options. It will, check to, in order:
-// - write the changes back to the file
-// - print a diff of what would change
-// - list the file as something that might change
-// - if nothing else, print the reformatted file to stdout
+// functions indicated in the provided options. The flags -l, -d, and -w can
+// be combined and will execute in order:
+//
+// 1. list the file if it would change (-l)
+// 2. print a diff of what would change (-d)
+// 3. write the changes back to the file (-w)
+//
+// If none of these flags are set, print the reformatted file to stdout.
 func visitFile(filename string, opts options) (bool, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
@@ -96,17 +99,15 @@ func visitFile(filename string, opts options) (bool, error) {
 	original := string(content)
 	hasChanges := result != original
 
-	// Are we being asked to write the resultant change back to the file?
-	if opts.write {
-		if hasChanges {
-			return true, os.WriteFile(filename, []byte(result), 0o644)
+	// If any of the action flags are set, perform them in order
+	if opts.list || opts.diff || opts.write {
+		// First: list files that would change
+		if opts.list && hasChanges {
+			fmt.Println(filename)
 		}
-		return false, nil
-	}
 
-	// Or are we being asked to print a unified diff what would be changed?
-	if opts.diff {
-		if hasChanges {
+		// Second: print unified diff
+		if opts.diff && hasChanges {
 			unified := difflib.UnifiedDiff{
 				A:        difflib.SplitLines(original),
 				B:        difflib.SplitLines(result),
@@ -120,18 +121,18 @@ func visitFile(filename string, opts options) (bool, error) {
 			}
 			fmt.Print(diffText)
 		}
-		return hasChanges, nil
-	}
 
-	// Or are we being asked to print files that have changes?
-	if opts.list {
-		if hasChanges {
-			fmt.Println(filename)
+		// Third: write changes back to file
+		if opts.write && hasChanges {
+			if err := os.WriteFile(filename, []byte(result), 0o644); err != nil {
+				return hasChanges, err
+			}
 		}
+
 		return hasChanges, nil
 	}
 
-	// Hey, if we get here, we'll just print what we would do
+	// If no flags are set, print the reformatted file to stdout
 	fmt.Print(result)
 
 	return hasChanges, nil
