@@ -1,4 +1,5 @@
 # Test: mixed files and directories as arguments
+# RFC 1 Section 2.2
 
 testdir="$TMPDIR/mixedtest"
 mkdir -p "$testdir/subdir"

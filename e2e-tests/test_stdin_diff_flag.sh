@@ -1,4 +1,5 @@
 # Test: -d flag with stdin (outputs formatted code, not diff)
+# RFC 4
 # Note: -d flag is ignored with stdin, formatted output is produced instead
 
 output=$("$BINARY" -d << 'EOF'

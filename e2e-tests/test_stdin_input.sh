@@ -1,4 +1,5 @@
 # Test: stdin input
+# RFC 1 Section 2.1
 
 output=$("$BINARY" << 'EOF'
 package main

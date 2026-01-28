@@ -1,4 +1,5 @@
 # Test: combined -l -d -w flags (all three together)
+# RFC 2 Section 1.2, RFC 3 Section 1.3, RFC 4 Section 1.3
 
 testfile="$TMPDIR/combined_ldw_test.go"
 

@@ -1,4 +1,5 @@
 # Test: stdin with flags
+# RFC 1 Sections 2.1, 5.1
 
 output=$("$BINARY" -llen 40 << 'EOF'
 package main

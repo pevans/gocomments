@@ -1,4 +1,5 @@
 # Test: directory argument with /... ellipsis (recursive)
+# RFC 1 Section 2.2
 
 testdir="$TMPDIR/ellipsistest"
 mkdir -p "$testdir/subdir/nested"

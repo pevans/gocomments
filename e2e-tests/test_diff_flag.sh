@@ -1,4 +1,5 @@
 # Test: -d flag outputs diff
+# RFC 4
 
 testfile="$TMPDIR/diff_test.go"
 

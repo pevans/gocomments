@@ -1,4 +1,5 @@
 # Test: Go files with syntax/parse errors
+# RFC 1 Section 2.1
 
 testfile="$TMPDIR/syntax_error.go"
 

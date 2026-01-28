@@ -1,4 +1,5 @@
 # Test: various exit code behaviors
+# RFC 1 Section 2.3
 
 failed=0
 

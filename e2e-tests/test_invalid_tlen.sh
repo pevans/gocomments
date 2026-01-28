@@ -1,4 +1,5 @@
 # Test: invalid value for -tlen (negative or zero uses default)
+# RFC 1 Section 5.1
 
 # Test negative value
 output=$("$BINARY" -tlen -5 << 'EOF'

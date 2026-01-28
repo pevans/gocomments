@@ -1,4 +1,5 @@
 # Test: output order with multiple files is deterministic
+# RFC 1 Section 2.2
 
 testdir="$TMPDIR/ordertest"
 mkdir -p "$testdir"

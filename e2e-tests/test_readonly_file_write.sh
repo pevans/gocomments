@@ -1,4 +1,5 @@
 # Test: read-only files with -w flag
+# RFC 2
 
 testfile="$TMPDIR/readonly.go"
 

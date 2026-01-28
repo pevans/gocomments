@@ -1,4 +1,5 @@
 # Test: -l output uses paths as provided (relative vs absolute)
+# RFC 3
 
 testfile="$TMPDIR/pathtest.go"
 

@@ -1,4 +1,5 @@
 # Test: -w flag with stdin (should still output to stdout, not write)
+# RFC 2
 
 output=$("$BINARY" -w << 'EOF' 2>&1 || true
 package main

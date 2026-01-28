@@ -1,4 +1,5 @@
 # Test: -w flag writes and exits
+# RFC 2
 
 testfile="$TMPDIR/write_test.go"
 

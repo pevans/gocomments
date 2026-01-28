@@ -1,4 +1,5 @@
 # Test: -l flag lists files needing changes
+# RFC 3
 
 needs_format="$TMPDIR/needs_format.go"
 already_formatted="$TMPDIR/already_formatted.go"

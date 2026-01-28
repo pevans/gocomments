@@ -1,4 +1,5 @@
 # Test: directory argument (processes all .go files)
+# RFC 1 Section 2.2
 
 testdir="$TMPDIR/dirtest"
 mkdir -p "$testdir"

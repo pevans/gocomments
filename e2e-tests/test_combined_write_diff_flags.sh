@@ -1,4 +1,5 @@
 # Test: combined -w -d flags (diff shown, then file written)
+# RFC 2 Section 1.2, RFC 4 Section 1.3
 
 testfile="$TMPDIR/combined_wd_test.go"
 

@@ -1,4 +1,5 @@
 # Test: combined -l -d flags (list first, then diff)
+# RFC 3 Section 1.3, RFC 4 Section 1.3
 
 testfile="$TMPDIR/combined_ld_test.go"
 

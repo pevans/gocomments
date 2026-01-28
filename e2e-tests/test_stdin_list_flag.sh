@@ -1,4 +1,5 @@
 # Test: -l flag with stdin (outputs formatted code, not list)
+# RFC 3
 # Note: -l flag is ignored with stdin, formatted output is produced instead
 
 output=$("$BINARY" -l << 'EOF'

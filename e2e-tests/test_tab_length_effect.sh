@@ -1,4 +1,5 @@
 # Test: -tlen affects wrapping
+# RFC 1 Section 5, 5.1
 # With tlen=4: availableLength = 78 - 4 - 2 - 1 = 71 chars
 # With tlen=8: availableLength = 78 - 8 - 2 - 1 = 67 chars
 # Comment is 71 chars: fits with tlen=4, wraps with tlen=8

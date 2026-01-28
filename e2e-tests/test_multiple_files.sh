@@ -1,4 +1,5 @@
 # Test: multiple files as arguments
+# RFC 1 Section 2.2
 
 file1="$TMPDIR/multi1.go"
 file2="$TMPDIR/multi2.go"
