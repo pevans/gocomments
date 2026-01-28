@@ -294,40 +294,44 @@ func example() {}
 `,
 		},
 		{
-			name:       "block comment not reformatted",
+			name:       "single-line block comment wrapped",
 			lineLength: 50,
 			tabLength:  4,
 			input: `package main
 
-/* This is a very long block comment that would normally be wrapped if it was a line comment but should not be reformatted */
+/* This is a very long block comment that would normally be wrapped if it was a line comment and should now be reformatted */
 func example() {}
 `,
 			want: `package main
 
-/* This is a very long block comment that would normally be wrapped if it was a line comment but should not be reformatted */
+/*
+ * This is a very long block comment that would
+ * normally be wrapped if it was a line comment
+ * and should now be reformatted
+ */
 func example() {}
 `,
 		},
 		{
-			name:       "multi-line block comment not reformatted",
+			name:       "multi-line block comment rewrapped",
 			lineLength: 50,
 			tabLength:  4,
 			input: `package main
 
 /*
-This is a multi-line block comment
-   with unusual formatting
-      and indentation that should be preserved
-*/
+ * This is a multi-line block comment that has
+ * unusual line breaks and should be
+ * reformatted to wrap optimally
+ */
 func example() {}
 `,
 			want: `package main
 
 /*
-This is a multi-line block comment
-   with unusual formatting
-      and indentation that should be preserved
-*/
+ * This is a multi-line block comment that has
+ * unusual line breaks and should be reformatted
+ * to wrap optimally
+ */
 func example() {}
 `,
 		},
@@ -594,6 +598,88 @@ func example() {}
 func example() {}
 `,
 		},
+		{
+			name:       "inline block comment not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+func example() {
+	x := 42 /* this is a very long inline block comment that should not be reformatted */ + 10
+}
+`,
+			want: `package main
+
+func example() {
+	x := 42 /* this is a very long inline block comment that should not be reformatted */ + 10
+}
+`,
+		},
+		{
+			name:       "block comment with noformat directive preserved",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+/* This is a long comment gocomments:noformat
+that should not be reformatted at all */
+func example() {}
+`,
+			want: `package main
+
+/* This is a long comment gocomments:noformat
+that should not be reformatted at all */
+func example() {}
+`,
+		},
+		{
+			name:       "block comment containing code not reformatted",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+/*
+x := 42
+y := 100
+return x + y
+*/
+func example() {}
+`,
+			want: `package main
+
+/*
+x := 42
+y := 100
+return x + y
+*/
+func example() {}
+`,
+		},
+		{
+			name:       "block comment with multiple paragraphs",
+			lineLength: 50,
+			tabLength:  4,
+			input: `package main
+
+/*
+ * First paragraph with very long text that should be wrapped properly.
+ *
+ * Second paragraph also with long text that needs wrapping.
+ */
+func example() {}
+`,
+			want: `package main
+
+/*
+ * First paragraph with very long text that
+ * should be wrapped properly.
+ *
+ * Second paragraph also with long text that
+ * needs wrapping.
+ */
+func example() {}
+`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -610,6 +696,48 @@ func example() {}
 			})
 
 			assert.Equal(t, tt.want, got, "reformatComments() output mismatch")
+		})
+	}
+}
+
+func TestDetectBlockCommentPattern(t *testing.T) {
+	tests := []struct {
+		name         string
+		commentText  string
+		wantPrefix   string
+		wantHasSpace bool
+	}{
+		{
+			name:         "single-line comment",
+			commentText:  "/* text */",
+			wantPrefix:   "",
+			wantHasSpace: true,
+		},
+		{
+			name:         "multi-line with space-star-space",
+			commentText:  "/*\n * line one\n * line two\n */",
+			wantPrefix:   " *",
+			wantHasSpace: true,
+		},
+		{
+			name:         "multi-line with space-star-no-space",
+			commentText:  "/*\n *line one\n *line two\n */",
+			wantPrefix:   " *",
+			wantHasSpace: false,
+		},
+		{
+			name:         "multi-line with only spaces",
+			commentText:  "/*\n  line one\n  line two\n */",
+			wantPrefix:   "  ",
+			wantHasSpace: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			prefix, hasSpace := detectBlockCommentPattern(tt.commentText)
+			assert.Equal(t, tt.wantPrefix, prefix)
+			assert.Equal(t, tt.wantHasSpace, hasSpace)
 		})
 	}
 }

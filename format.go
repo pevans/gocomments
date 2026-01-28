@@ -115,6 +115,236 @@ func isCommentedCode(comments []*ast.Comment, commentPrefix string) bool {
 	return false
 }
 
+// detectBlockCommentPattern analyzes the interior of a block comment to
+// determine what prefix pattern is used for interior lines. Returns the
+// prefix (e.g., " *", " ", "") and whether there's a space after it.
+func detectBlockCommentPattern(commentText string) (prefix string, hasSpaceAfter bool) {
+	// Remove /* and */ delimiters
+	text := strings.TrimPrefix(commentText, "/*")
+	text = strings.TrimSuffix(text, "*/")
+	lines := strings.Split(text, "\n")
+
+	// Single-line comment has no pattern
+	if len(lines) <= 1 {
+		// Check if there's a space after /*
+		if len(text) > 0 && (text[0] == ' ' || text[0] == '\t') {
+			return "", true
+		}
+
+		return "", false
+	}
+
+	// Collect interior lines (exclude first and last)
+	var interiorLines []string
+	for i := 1; i < len(lines)-1; i++ {
+		interiorLines = append(interiorLines, lines[i])
+	}
+
+	if len(interiorLines) == 0 {
+		return "", true
+	}
+
+	// Check first interior line for pattern
+	firstLine := interiorLines[0]
+
+	// Look for " * " pattern
+	if strings.HasPrefix(firstLine, " *") {
+		if len(firstLine) > 2 && firstLine[2] == ' ' {
+			return " *", true
+		}
+
+		return " *", false
+	}
+
+	// Look for just spaces
+	spaceCount := 0
+	for i := 0; i < len(firstLine); i++ {
+		if firstLine[i] == ' ' {
+			spaceCount++
+		} else {
+			break
+		}
+	}
+
+	if spaceCount > 0 {
+		return strings.Repeat(" ", spaceCount), false
+	}
+
+	// No pattern detected
+	return "", false
+}
+
+// reformatBlockComment reformats a single block comment (/* ... */)
+func reformatBlockComment(
+	lines []string,
+	comment *ast.Comment,
+	fset *token.FileSet,
+	opts options,
+) []string {
+	pos := fset.Position(comment.Pos())
+	lineIdx := pos.Line - 1
+
+	if lineIdx < 0 || lineIdx >= len(lines) {
+		return lines
+	}
+
+	line := lines[lineIdx]
+	indent := line[:pos.Column-1]
+	indentWithSpaces := strings.ReplaceAll(indent, "\t", strings.Repeat(" ", opts.tabLength))
+
+	// Check for noformat directive
+	if strings.Contains(comment.Text, "gocomments:noformat") {
+		return lines
+	}
+
+	// Detect the pattern used in the comment
+	prefix, hasSpaceAfter := detectBlockCommentPattern(comment.Text)
+
+	// Extract text content from the block comment and group into paragraphs
+	text := strings.TrimPrefix(comment.Text, "/*")
+	text = strings.TrimSuffix(text, "*/")
+
+	// Split into lines
+	textLines := strings.Split(text, "\n")
+
+	// For single-line comments, check if it contains code
+	if len(textLines) <= 1 {
+		// Skip code detection for single-line -- just reformat
+	} else {
+		// Check if this is commented-out code
+		var codeLines []string
+		for i, line := range textLines {
+			// Skip first and last line (they're typically empty or just
+			// delimiters)
+			if i == 0 || i == len(textLines)-1 {
+				continue
+			}
+
+			// Remove the prefix pattern if present
+			if prefix != "" && strings.HasPrefix(line, prefix) {
+				line = strings.TrimPrefix(line, prefix)
+				if hasSpaceAfter && len(line) > 0 && line[0] == ' ' {
+					line = line[1:]
+				}
+			} else {
+				line = strings.TrimLeft(line, " \t")
+			}
+
+			codeLines = append(codeLines, line)
+		}
+
+		// Try to parse as code
+		fullText := strings.Join(codeLines, "\n")
+		fset := token.NewFileSet()
+
+		// Try parsing as statements
+		wrappedText := "package main\nfunc _() {\n" + fullText + "\n}"
+		_, err := parser.ParseFile(fset, "", wrappedText, parser.AllErrors)
+		if err == nil {
+			// This is code, don't reformat
+			return lines
+		}
+	}
+
+	// Extract content and group into paragraphs
+	type paragraph struct {
+		lines []string
+	}
+	var paragraphs []paragraph
+	var currentParagraph paragraph
+
+	for i, line := range textLines {
+		// Skip first line if multi-line (typically empty after /*)
+		if len(textLines) > 1 && i == 0 {
+			if strings.TrimSpace(line) != "" {
+				// First line has content, include it
+				currentParagraph.lines = append(currentParagraph.lines, strings.TrimSpace(line))
+			}
+			continue
+		}
+
+		// Skip last line if multi-line (typically empty before */)
+		if len(textLines) > 1 && i == len(textLines)-1 {
+			continue
+		}
+
+		// Remove the prefix pattern if present
+		var contentLine string
+		if prefix != "" && strings.HasPrefix(line, prefix) {
+			line = strings.TrimPrefix(line, prefix)
+			if hasSpaceAfter && len(line) > 0 && line[0] == ' ' {
+				line = line[1:]
+			}
+			contentLine = line
+		} else {
+			contentLine = strings.TrimLeft(line, " \t")
+		}
+
+		// Check if this is a paragraph delimiter (empty line)
+		if strings.TrimSpace(contentLine) == "" {
+			// Save current paragraph if it has content
+			if len(currentParagraph.lines) > 0 {
+				paragraphs = append(paragraphs, currentParagraph)
+				currentParagraph = paragraph{}
+			}
+			// Add empty paragraph marker
+			paragraphs = append(paragraphs, paragraph{lines: []string{""}})
+		} else {
+			currentParagraph.lines = append(currentParagraph.lines, contentLine)
+		}
+	}
+
+	// Don't forget the last paragraph
+	if len(currentParagraph.lines) > 0 {
+		paragraphs = append(paragraphs, currentParagraph)
+	}
+
+	// Calculate available space for text For block comments, the line format
+	// is: indent + " * " + text We account for " *" (2 chars) + space (1
+	// char) + a margin (2 chars)
+	availableLength := opts.lineLength - len(indentWithSpaces) - 5
+	if availableLength <= 0 {
+		availableLength = max(opts.lineLength-5, 40)
+	}
+
+	// Build the new block comment
+	var newCommentLines []string
+	newCommentLines = append(newCommentLines, indent+"/*")
+
+	for _, para := range paragraphs {
+		// Empty paragraph means blank line
+		if len(para.lines) == 1 && para.lines[0] == "" {
+			newCommentLines = append(newCommentLines, indent+" *")
+			continue
+		}
+
+		// Join paragraph text and wrap it
+		fullText := strings.Join(para.lines, " ")
+		wrappedLines := wrapText(fullText, availableLength)
+
+		// Add wrapped lines
+		for _, wrappedLine := range wrappedLines {
+			newCommentLines = append(newCommentLines, indent+" * "+wrappedLine)
+		}
+	}
+
+	newCommentLines = append(newCommentLines, indent+" */")
+
+	// Find the end line of the comment
+	endPos := fset.Position(comment.End())
+	lastLineIdx := endPos.Line - 1
+
+	// Rebuild lines array
+	newLines := make([]string, 0, len(lines)-(lastLineIdx-lineIdx)+len(newCommentLines))
+	newLines = append(newLines, lines[:lineIdx]...)
+	newLines = append(newLines, newCommentLines...)
+	if lastLineIdx+1 < len(lines) {
+		newLines = append(newLines, lines[lastLineIdx+1:]...)
+	}
+
+	return newLines
+}
+
 // reformatCommentGroup reformats one specific group of comments.
 func reformatCommentGroup(
 	lines []string,
@@ -134,17 +364,22 @@ func reformatCommentGroup(
 	indent := firstLine[:firstPos.Column-1]
 	indentWithSpaces := strings.ReplaceAll(indent, "\t", strings.Repeat(" ", opts.tabLength))
 
-	// Determine the number of slashes
+	// Determine comment type and handle accordingly
+	firstCommentText := comments[0].Text
+
+	// Check if this is a block comment (/* ... */)
+	if strings.HasPrefix(firstCommentText, "/*") {
+		// Only reformat if it's a single block comment in this group
+		if len(comments) != 1 {
+			return lines
+		}
+		return reformatBlockComment(lines, comments[0], fset, opts)
+	}
+
+	// Handle line comments Determine the number of slashes
 	slashCount := 2 // default to commenting with "//" as the leader
 
 	// If there's more slashes in this block, keep them
-	firstCommentText := comments[0].Text
-
-	// Don't reformat block comments that begin with /*
-	if strings.HasPrefix(firstCommentText, "/*") {
-		return lines
-	}
-
 	for i := 0; i < len(firstCommentText) && firstCommentText[i] == '/'; i++ {
 		slashCount = i + 1
 	}
@@ -155,7 +390,8 @@ func reformatCommentGroup(
 	// Only skip if there's NO space after the slashes and it starts with
 	// "go:"
 	firstCommentWithoutPrefix := strings.TrimPrefix(firstCommentText, commentPrefix)
-	hasLeadingSpace := len(firstCommentWithoutPrefix) > 0 && (firstCommentWithoutPrefix[0] == ' ' || firstCommentWithoutPrefix[0] == '\t')
+	hasLeadingSpace := len(firstCommentWithoutPrefix) > 0 &&
+		(firstCommentWithoutPrefix[0] == ' ' || firstCommentWithoutPrefix[0] == '\t')
 	if !hasLeadingSpace && strings.HasPrefix(firstCommentWithoutPrefix, "go:") {
 		return lines
 	}
