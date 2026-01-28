@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BASE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TMPDIR=$(mktemp -d)
 BINARY="$TMPDIR/gocomments"
 PASSED=0
@@ -13,7 +13,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "Building gocomments..."
-go build -o "$BINARY" "$SCRIPT_DIR"
+go build -o "$BINARY" "$BASE_DIR"
 
 pass() {
     echo "PASS: $1"
@@ -30,7 +30,7 @@ echo
 echo "Running tests..."
 echo
 
-for test_file in "$SCRIPT_DIR/e2e-tests"/test_*.sh; do
+for test_file in "$BASE_DIR/tests"/test_*.sh; do
     source "$test_file"
 done
 

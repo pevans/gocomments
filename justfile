@@ -1,8 +1,10 @@
-test:
+unit-test:
     - go test .
 
 e2e-test:
-    - bash run-e2e-tests.sh
+    - bash bin/run-tests.sh
+
+test: unit-test e2e-test
 
 build:
     - go build -o gocomments .
