@@ -22,9 +22,8 @@ if [[ ${exit_code:-0} -eq 0 ]]; then
 fi
 
 # Test 3: Invalid Go code piped to stdin
-invalid_stdin=$("$BINARY" <<< "this is not valid Go code" 2>&1 || true)
-exit_code=$?
-if [[ $exit_code -eq 0 ]]; then
+"$BINARY" <<< "this is not valid Go code" > /dev/null 2>&1 || exit_code=$?
+if [[ ${exit_code:-0} -eq 0 ]]; then
     echo "FAIL: invalid Go code to stdin should produce error"
     failed=1
 fi
