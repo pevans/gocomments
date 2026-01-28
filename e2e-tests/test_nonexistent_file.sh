@@ -1,4 +1,5 @@
 # Test: non-existent file handling
+# RFC 1 Section 2.4
 
 output=$("$BINARY" "/nonexistent/path/to/file.go" 2>&1 || true)
 exit_code=$?

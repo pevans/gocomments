@@ -45,6 +45,18 @@ to gocomments, only Go source files (which end in `.go`) will be processed.
 When multiple files are processed in this manner, their output is _not_
 delineated in any way.
 
+### 2.2.1. Symbolic links
+
+gocomments follows symbolic links when processing files and directories:
+
+- If a symbolic link points to a file, gocomments will process the target file
+  as if it were provided directly.
+- If a symbolic link points to a directory, gocomments will process all Go
+  source files within the target directory (and recursively if using the `...`
+  notation).
+
+The behavior is identical to processing the target file or directory directly.
+
 ## 2.3. Exit codes
 
 When processing files from command line arguments, gocomments will exit with
@@ -55,6 +67,32 @@ changed, gocomments exits with code 0.
 When processing stdin, gocomments exits with code 1 only if the input is not
 valid Go code. Successfully reformatted stdin (regardless of whether changes
 were made) exits with code 0.
+
+## 2.4. Error handling for non-existent paths
+
+When a file or directory provided as a command-line argument does not exist,
+gocomments will produce an error message and exit with a non-zero exit code.
+
+- If a file path does not exist, an error message is printed indicating the
+  file cannot be found.
+- If a directory path does not exist (including those specified with the `...`
+  notation), an error message is printed indicating the directory cannot be
+  found.
+
+This behavior ensures that typos or incorrect paths are caught early and
+reported to the user.
+
+## 2.5. Line ending handling
+
+gocomments correctly handles files with different line ending conventions:
+
+- Files with Unix line endings (LF, `\n`) are processed normally.
+- Files with Windows line endings (CRLF, `\r\n`) are also processed correctly.
+- Files with mixed line endings are handled appropriately.
+
+The output from gocomments will use the line ending convention appropriate for
+the context (stdout typically uses LF, while files written in-place preserve
+their original line ending style when feasible).
 
 # 3. Comment types and behaviors
 

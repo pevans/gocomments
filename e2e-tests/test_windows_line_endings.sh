@@ -1,4 +1,5 @@
 # Test: files with Windows line endings (CRLF)
+# RFC 1 Section 2.5
 
 testfile="$TMPDIR/crlf.go"
 

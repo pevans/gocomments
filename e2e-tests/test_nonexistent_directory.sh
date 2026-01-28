@@ -1,4 +1,5 @@
 # Test: non-existent directory handling
+# RFC 1 Section 2.4
 
 output=$("$BINARY" "/nonexistent/directory/..." 2>&1 || true)
 exit_code=$?

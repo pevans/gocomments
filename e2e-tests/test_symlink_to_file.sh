@@ -1,4 +1,5 @@
 # Test: symlinks to files
+# RFC 1 Section 2.2.1
 
 testdir="$TMPDIR/symlinktest"
 mkdir -p "$testdir"
