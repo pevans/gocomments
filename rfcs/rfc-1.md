@@ -94,6 +94,16 @@ The output from gocomments will use the line ending convention appropriate for
 the context (stdout typically uses LF, while files written in-place preserve
 their original line ending style when feasible).
 
+## 2.6. Invalid Go files
+
+If a file is not valid Go code, then gocomments will return an exit code of 1
+and print an error message. This can happen if:
+
+- A user provides a non-Go file as a file path
+- A user pipes data that is not valid Go code into stdin
+- A user scans a directory which contains files that end in `.go` but do not
+  contain valid Go code
+
 # 3. Comment types and behaviors
 
 Go supports several types of comments -- chiefly, end-of-line comments (`//
