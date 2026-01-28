@@ -8,6 +8,9 @@ add-on tool for projects that are already using
 [gofumpt](https://github.com/mvdan/gofumpt), which themselves do not alter the
 contents of comments.
 
+gocomments operates both on end-of-line comments (`// ...`) and slash-star
+block comments (`/* ... */`).
+
 gocomments is designed to look and act similarly to gofmt; it accepts many of
 gofmt's command-line arguments, both their form and intent. Below you will
 find the help summary that explains what is supported:
@@ -59,7 +62,6 @@ include:
   leader and text may be formatted, but the lack of spacing will be
   preserved.
 - Any lines of code that are commented out are left alone.
-- Slash-star inline comment blocks (`/* ... */`) are left alone.
 
 If there's a comment block that you would prefer remain unformatted, you can
 do so by adding `gocomments:noformat` to the end of the first (or only!) line
