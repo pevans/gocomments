@@ -2,7 +2,7 @@
 Request for Comments: 1
 Drafted At: 2026-01-27
 Authors:
-  - Peter Evans <peter@modul8r.com>
+  - Peter Evans
 ---
 
 # 1. gocomments: Essential structure and operation
