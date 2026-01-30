@@ -401,6 +401,12 @@ func reformatCommentGroup(
 		return lines
 	}
 
+	// Check for noformat directive in the first comment According to RFC 1,
+	// the directive should be at the end of the first line
+	if strings.Contains(comments[0].Text, "gocomments:noformat") {
+		return lines
+	}
+
 	// Calculate available space for text. If we're running really low on
 	// available space, we'll push out the width of the comment to 40
 	availableLength := opts.lineLength - len(indentWithSpaces) - len(commentPrefix) - 1
