@@ -280,15 +280,22 @@ func reformatBlockComment(
 			contentLine = strings.TrimLeft(line, " \t")
 		}
 
-		// Check if this is a paragraph delimiter (empty line)
-		if strings.TrimSpace(contentLine) == "" {
+		// Check if this is a paragraph delimiter (empty line or list item)
+		if paragraphDelimiter(contentLine) {
 			// Save current paragraph if it has content
 			if len(currentParagraph.lines) > 0 {
 				paragraphs = append(paragraphs, currentParagraph)
 				currentParagraph = paragraph{}
 			}
-			// Add empty paragraph marker
-			paragraphs = append(paragraphs, paragraph{lines: []string{""}})
+
+			// If this is a blank line, add it as a complete paragraph.
+			if strings.TrimSpace(contentLine) == "" {
+				paragraphs = append(paragraphs, paragraph{lines: []string{""}})
+			} else {
+				// Actually, it's a list item -- set as current paragraph to
+				// accumulate continuation lines
+				currentParagraph = paragraph{lines: []string{contentLine}}
+			}
 		} else {
 			currentParagraph.lines = append(currentParagraph.lines, contentLine)
 		}
@@ -439,16 +446,22 @@ func reformatCommentGroup(
 				currentParagraph = paragraph{}
 			}
 
-			// Add a new paragraph to represent the next paragraph. If text
-			// was blank (e.g. it's just a blank line comment), then that's
-			// what gets added. But if it's a list item, then it'll contain
-			// that.
-			currentParagraph.hasLeadingSpace = hasLeadingSpace
-			paragraphs = append(paragraphs, paragraph{
-				texts:           []string{text},
-				hasLeadingSpace: hasLeadingSpace,
-				originalLines:   []string{originalLine},
-			})
+			// If this is a blank line, add it as a complete paragraph.
+			if strings.TrimSpace(text) == "" {
+				paragraphs = append(paragraphs, paragraph{
+					texts:           []string{text},
+					hasLeadingSpace: hasLeadingSpace,
+					originalLines:   []string{originalLine},
+				})
+			} else {
+				// It's actually a list item -- set as current paragraph to
+				// accumulate continuation lines
+				currentParagraph = paragraph{
+					texts:           []string{text},
+					hasLeadingSpace: hasLeadingSpace,
+					originalLines:   []string{originalLine},
+				}
+			}
 		} else {
 			if len(currentParagraph.texts) == 0 {
 				currentParagraph.hasLeadingSpace = hasLeadingSpace
