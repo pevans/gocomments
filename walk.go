@@ -16,8 +16,8 @@ import (
 func walkPath(path string, opts options) (bool, error) {
 	// Recurse through all subdirectories of the provided path, but exclude
 	// hidden directories found therein.
-	if strings.HasSuffix(path, "/...") {
-		baseDir := strings.TrimSuffix(path, "/...")
+	if before, ok := strings.CutSuffix(path, "/..."); ok {
+		baseDir := before
 		return walkDirectory(baseDir, opts, true)
 	}
 
