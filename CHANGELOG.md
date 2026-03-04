@@ -5,6 +5,27 @@ All notable changes to gocomments will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-03-04
+
+### Changed
+
+- Single-line slash-star comments that have some code on the same line will no
+  longer be reformatted. For example, this line will be left alone:
+
+```go
+/* leave me be */ func dosomething() { ... }
+```
+
+- Black box tests are now implemented using
+  [bats](https://github.com/bats-core/bats-core) rather than a bespoke bash
+  testing harness.
+- RFCs have been renamed to Specifications (or specs), and the `rfcs`
+  directory is now `specs`.
+
+### Fixed
+
+### Removed
+
 ## [0.2.0] - 2026-01-29
 
 ### Added
@@ -27,5 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This is the first release of gocomments, a tool for automatically reformatting comments in Go source files to respect preferred line and tab lengths.
 
+[0.3.0]: https://github.com/pevans/gocomments/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/pevans/gocomments/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/pevans/gocomments/releases/tag/v0.1.0
