@@ -1,7 +1,6 @@
 ---
-Request for Comments: 3
+Specification: 3
 Drafted At: 2026-01-27
-Approved At: 2026-01-29
 Authors:
   - Peter Evans
 ---
@@ -22,13 +21,13 @@ printed (one per line) that represent files where changes would occur.
 
 # 1.2. Exit codes
 
-The exit code behavior described in RFC 1 section 2.3 remains unchanged when
+The exit code behavior described in Spec 1 section 2.3 remains unchanged when
 using the `-l` flag. gocomments will exit with code 1 if any files would be
 changed (i.e., if any files are listed), and exit with code 0 if no files
 required reformatting.
 
 # 1.3. Combination with other flags
 
-When gocomments is executed with both `-l` and `-w` flags (defined RFC 2),
+When gocomments is executed with both `-l` and `-w` flags (defined Spec 2),
 files are both listed _and_ written in-place. That is, the behaviors of the
 two flags are combined, rather than mutually exclusive.

@@ -1,7 +1,6 @@
 ---
-Request for Comments: 5
+Specification: 5
 Drafted At: 2026-01-27
-Approved At: 2026-01-29
 Authors:
   - Peter Evans
 ---
@@ -82,7 +81,7 @@ independent unit for wrapping purposes.
 
 ## 4.1. List items as paragraph boundaries
 
-In addition to the paragraph boundaries defined in RFC 1 (blank comment lines),
+In addition to the paragraph boundaries defined in Spec 1 (blank comment lines),
 list items also create paragraph boundaries. When a list item is encountered,
 it starts a new paragraph. This means that:
 

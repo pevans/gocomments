@@ -425,7 +425,7 @@ func reformatCommentGroup(
 		return lines
 	}
 
-	// Check for noformat directive in the first comment According to RFC 1,
+	// Check for noformat directive in the first comment According to Spec 1,
 	// the directive should be at the end of the first line
 	if strings.Contains(comments[0].Text, "gocomments:noformat") {
 		return lines

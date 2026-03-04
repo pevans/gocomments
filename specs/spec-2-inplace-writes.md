@@ -1,7 +1,6 @@
 ---
-Request for Comments: 2
+Specification: 2
 Drafted At: 2026-01-27
-Approved At: 2026-01-29
 Authors:
   - Peter Evans
 ---
@@ -20,7 +19,7 @@ read by gocomments will be written back with reformatted comments.
 
 # 1.2. Exit codes
 
-The exit code behavior described in RFC 1 section 2.3 remains unchanged when
+The exit code behavior described in Spec 1 section 2.3 remains unchanged when
 using the `-w` flag. gocomments will exit with code 1 if any files would be
 changed (or were changed, when using `-w`), and exit with code 0 if no files
 required reformatting.

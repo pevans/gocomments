@@ -1,7 +1,6 @@
 ---
-Request for Comments: 6
+Specification: 6
 Drafted At: 2026-03-04
-Approved At: 2026-03-04
 Authors:
   - Peter Evans
 ---
@@ -111,6 +110,6 @@ func example() {}
   other rules.
 - Block comments with non-whitespace text before the `/*` on the same line are
   already excluded from processing by the general inline comment rule and are
-  not affected by this RFC.
+  not affected by this spec.
 - Multi-line block comments (those containing newlines) are not affected by
   this rule and continue to be reformatted as before.

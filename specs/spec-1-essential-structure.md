@@ -1,7 +1,6 @@
 ---
-Request for Comments: 1
+Specification: 1
 Drafted At: 2026-01-27
-Approved At: 2026-01-29
 Authors:
   - Peter Evans
 ---

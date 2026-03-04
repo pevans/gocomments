@@ -1,7 +1,6 @@
 ---
-Request for Comments: 4
+Specification: 4
 Drafted At: 2026-01-27
-Approved At: 2026-01-29
 Authors:
   - Peter Evans
 ---
@@ -39,7 +38,7 @@ Below is an example unified diff:
 
 # 1.2. Exit codes
 
-The exit code behavior described in RFC 1 section 2.3 remains unchanged when
+The exit code behavior described in Spec 1 section 2.3 remains unchanged when
 using the `-d` flag. gocomments will exit with code 1 if any files would be
 changed (i.e., if any diffs are shown), and exit with code 0 if no files
 required reformatting.
@@ -50,7 +49,7 @@ When gocomments is executed with other command-line flags, their behavior is
 _combined_ rather than mutually exclusive.
 
 If gocomments is executed with `-w` and `-d`, then both unified diffs are
-printed and changes are written in-place (see RFC 2 for details on that).
+printed and changes are written in-place (see Spec 2 for details on that).
 
 If gocomments is executed with `-l` and `-d`, then both filenames _and_
 unified diffs are printed to standard output. In such an event, the filename
