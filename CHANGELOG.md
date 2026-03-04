@@ -22,10 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RFCs have been renamed to Specifications (or specs), and the `rfcs`
   directory is now `specs`.
 
-### Fixed
-
-### Removed
-
 ## [0.2.0] - 2026-01-29
 
 ### Added
