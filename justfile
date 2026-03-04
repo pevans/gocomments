@@ -1,13 +1,13 @@
 unit-test:
-    - go test .
+    go test .
 
 e2e-test:
-    - bash bin/run-tests.sh
+    bash bin/run-tests.sh
 
 test: unit-test e2e-test
 
 build:
-    - go build -o gocomments .
+    go build -o gocomments .
 
 install: build
     mv gocomments ~/bin
