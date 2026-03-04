@@ -197,6 +197,23 @@ func reformatBlockComment(
 		return lines
 	}
 
+	// If this is a single-line block comment with non-whitespace text after
+	// it on the same line (e.g. `/* note */ someCode()`), and the full line
+	// fits within the line length limit, leave it as-is.
+	if !strings.Contains(comment.Text, "\n") {
+		endCol := pos.Column - 1 + len(comment.Text)
+		afterComment := ""
+		if endCol < len(line) {
+			afterComment = line[endCol:]
+		}
+		if strings.TrimSpace(afterComment) != "" {
+			lineWithSpaces := strings.ReplaceAll(line, "\t", strings.Repeat(" ", opts.tabLength))
+			if len(lineWithSpaces) <= opts.lineLength {
+				return lines
+			}
+		}
+	}
+
 	// Detect the pattern used in the comment
 	prefix, hasSpaceAfter := detectBlockCommentPattern(comment.Text)
 

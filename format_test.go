@@ -656,6 +656,49 @@ func example() {}
 `,
 		},
 		{
+			name:       "inline block comment with trailing code not reformatted",
+			lineLength: 78,
+			tabLength:  4,
+			input: `package main
+
+/* exported */ func Example() {}
+`,
+			want: `package main
+
+/* exported */ func Example() {}
+`,
+		},
+		{
+			name:       "inline block comment with trailing code at exact limit not reformatted",
+			lineLength: 37,
+			tabLength:  4,
+			input: `package main
+
+/* note */ func Example() { return }
+`,
+			want: `package main
+
+/* note */ func Example() { return }
+`,
+		},
+		{
+			name:       "standalone short single-line block comment still reformatted",
+			lineLength: 78,
+			tabLength:  4,
+			input: `package main
+
+/* Short block comment */
+func example() {}
+`,
+			want: `package main
+
+/*
+ * Short block comment
+ */
+func example() {}
+`,
+		},
+		{
 			name:       "block comment with multiple paragraphs",
 			lineLength: 50,
 			tabLength:  4,
