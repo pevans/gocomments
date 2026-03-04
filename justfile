@@ -8,3 +8,6 @@ test: unit-test e2e-test
 
 build:
     - go build -o gocomments .
+
+install: build
+    mv gocomments ~/bin
