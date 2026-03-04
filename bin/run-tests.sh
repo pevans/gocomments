@@ -2,41 +2,11 @@
 set -e
 
 BASE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-TMPDIR=$(mktemp -d)
-BINARY="$TMPDIR/gocomments"
-PASSED=0
-FAILED=0
 
-cleanup() {
-    rm -rf "$TMPDIR"
-}
-trap cleanup EXIT
+# Help bats_load_library find bats-support and bats-assert. Append common
+# Homebrew locations so CI systems can override by setting BATS_LIB_PATH
+# themselves before invoking this script.
+BATS_LIB_PATH="${BATS_LIB_PATH:+${BATS_LIB_PATH}:}/opt/homebrew/lib:/usr/local/lib"
+export BATS_LIB_PATH
 
-echo "Building gocomments..."
-go build -o "$BINARY" "$BASE_DIR"
-
-pass() {
-    echo "PASS: $1"
-    PASSED=$((PASSED + 1))
-}
-
-fail() {
-    echo "FAIL: $1"
-    echo "  $2"
-    FAILED=$((FAILED + 1))
-}
-
-echo
-echo "Running tests..."
-echo
-
-for test_file in "$BASE_DIR/tests"/test_*.sh; do
-    source "$test_file"
-done
-
-echo
-echo "Results: $PASSED passed, $FAILED failed"
-
-if [[ $FAILED -gt 0 ]]; then
-    exit 1
-fi
+exec bats "$BASE_DIR/tests/"*.bats "$@"
